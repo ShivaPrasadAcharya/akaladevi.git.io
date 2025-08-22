@@ -1345,3 +1345,14 @@ th.highlight-column {
     user-select: none;
     transition: filter 0.3s;
 }
+
+.sticky-md-html-search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-radius: 10px;
+    margin-bottom: 12px;
+}

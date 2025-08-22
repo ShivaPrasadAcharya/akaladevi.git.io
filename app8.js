@@ -25,10 +25,54 @@
             .replace(/\n/g, '<br>');
     }
 
+    function getAllHtmlFiles() {
+        var files = [];
+        for (var key in window) {
+            var match = key.match(/^html(\d+)Content$/);
+            if (match && window[key]) {
+                var idx = match[1];
+                var meta = window['html' + idx + 'Meta'] || {};
+                var label = (meta.name && meta.name.trim()) ? meta.name : ('html' + idx);
+                var emoji = (meta.emoji && meta.emoji.trim()) ? meta.emoji + ' ' : '';
+                files.push({
+                    key: 'html' + idx,
+                    label: label,
+                    emoji: emoji,
+                    type: 'html',
+                    content: window[key]
+                });
+            }
+        }
+        for (var key in window) {
+            var match = key.match(/^markdown(\d+)Content$/);
+            if (match && window[key]) {
+                var idx = match[1];
+                var meta = window['markdown' + idx + 'Meta'] || {};
+                var label = (meta.name && meta.name.trim()) ? meta.name : ('md' + idx);
+                var emoji = (meta.emoji && meta.emoji.trim()) ? meta.emoji + ' ' : '';
+                files.push({
+                    key: 'md' + idx,
+                    label: label,
+                    emoji: emoji,
+                    type: 'markdown',
+                    content: window[key]
+                });
+            }
+        }
+        files.sort(function(a, b) {
+            var na = parseInt(a.key.replace(/^(md|html)/,''), 10);
+            var nb = parseInt(b.key.replace(/^(md|html)/,''), 10);
+            if (a.key.startsWith('html') && b.key.startsWith('md')) return -1;
+            if (a.key.startsWith('md') && b.key.startsWith('html')) return 1;
+            return na-nb;
+        });
+        return files;
+    }
+
     // Search bar for HTML, searches all HTML and markdown files
     function addHtmlSearch(container, currentHtmlKey) {
         var searchBox = document.createElement('div');
-        searchBox.className = 'md-html-search-bar';
+        searchBox.className = 'md-html-search-bar sticky-md-html-search-bar';
         searchBox.style.display = 'flex';
         searchBox.style.alignItems = 'center';
         searchBox.style.gap = '8px';
@@ -43,12 +87,7 @@
         var nextBtn = searchBox.querySelector('.md-search-next');
         var countSpan = searchBox.querySelector('.md-search-count');
         var htmlContent = container.querySelector('.html-content');
-        var files = [];
-        if (window.html1Content) files.push({key: 'html1', label: 'html1', type: 'html', content: window.html1Content});
-        if (window.html2Content) files.push({key: 'html2', label: 'html2', type: 'html', content: window.html2Content});
-        if (window.html3Content) files.push({key: 'html3', label: 'html3', type: 'html', content: window.html3Content});
-        if (window.markdown1Content) files.push({key: 'md1', label: 'md1', type: 'markdown', content: window.markdown1Content});
-        if (window.markdown2Content) files.push({key: 'md2', label: 'md2', type: 'markdown', content: window.markdown2Content});
+        var files = getAllHtmlFiles();
         var allMatches = [];
         var currentGlobalIdx = 0;
 
@@ -79,12 +118,16 @@
                 currentGlobalIdx = 0;
             }
             var file = files[showFileIdx];
-            if (file.type === 'markdown') {
-                htmlContent.className = 'markdown-content';
-                htmlContent.innerHTML = simpleMarkdownToHtml(file.content);
+            if (file) {
+                if (file.type === 'markdown') {
+                    htmlContent.className = 'markdown-content';
+                    htmlContent.innerHTML = simpleMarkdownToHtml(file.content);
+                } else {
+                    htmlContent.className = 'html-content';
+                    htmlContent.innerHTML = file.html;
+                }
             } else {
-                htmlContent.className = 'html-content';
-                htmlContent.innerHTML = file.html;
+                htmlContent.innerHTML = '';
             }
             var highlights = htmlContent.querySelectorAll('.md-search-highlight');
             var localIdx = 0;
@@ -102,7 +145,7 @@
                 countSpan.textContent = '0 / 0';
             }
             var title = container.querySelector('.data-section-title');
-            if (title) title.textContent = (file.type === 'markdown' ? 'Markdown: ' : 'HTML: ') + file.label;
+            if (title) title.textContent = (file ? (file.type === 'markdown' ? 'Markdown: ' : 'HTML: ') + file.label : '');
         }
         input.addEventListener('input', function() {
             currentGlobalIdx = 0;
@@ -117,82 +160,80 @@
         updateHighlights();
     }
 
-    function injectHtmlMenu(filesDropdown) {
-        if (!filesDropdown || filesDropdown.querySelector('.files-html-main')) return;
-        var htmlMain = document.createElement('div');
-        htmlMain.className = 'files-dropdown-item files-html-main';
-        htmlMain.textContent = 'HTML';
-        htmlMain.style.fontWeight = 'bold';
-        htmlMain.tabIndex = 0;
-        htmlMain.style.cursor = 'pointer';
-        htmlMain.style.position = 'relative';
-
+    function injectHtmlMenuRibbon() {
+        if (document.querySelector('.html-ribbon-dropdown')) return;
+        var filesDropdown = document.querySelector('.files-dropdown');
+        if (!filesDropdown) return;
+        var htmlFiles = getAllHtmlFiles().filter(f => f.type === 'html');
+        if (htmlFiles.length === 0) return;
+        var htmlRibbon = document.createElement('div');
+        htmlRibbon.className = 'html-ribbon-dropdown';
+        htmlRibbon.style.display = 'inline-block';
+        htmlRibbon.style.position = 'relative';
+        htmlRibbon.style.marginLeft = '8px';
+        htmlRibbon.innerHTML = '<button class="html-ribbon-btn" style="font-weight:bold;cursor:pointer;padding:10px 20px;border-radius:25px;border:none;background:#f0f2f5;">HTML ▼</button>';
         var htmlSubmenu = document.createElement('div');
         htmlSubmenu.style.display = 'none';
         htmlSubmenu.style.position = 'absolute';
-        htmlSubmenu.style.left = '100%';
-        htmlSubmenu.style.top = '0';
+        htmlSubmenu.style.left = '0';
+        htmlSubmenu.style.top = '110%';
         htmlSubmenu.style.background = '#fff';
-        htmlSubmenu.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
-        htmlSubmenu.style.borderRadius = '8px';
+        htmlSubmenu.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)';
+        htmlSubmenu.style.borderRadius = '12px';
         htmlSubmenu.style.minWidth = '120px';
-        htmlSubmenu.style.zIndex = '1002';
-
-        var html1 = document.createElement('button');
-        html1.className = 'files-dropdown-item';
-        html1.textContent = 'html1';
-        html1.type = 'button';
-        html1.onclick = function(e) {
-            e.stopPropagation();
-            showHtml('html1');
-            htmlSubmenu.style.display = 'none';
-        };
-        var html2 = document.createElement('button');
-        html2.className = 'files-dropdown-item';
-        html2.textContent = 'html2';
-        html2.type = 'button';
-        html2.onclick = function(e) {
-            e.stopPropagation();
-            showHtml('html2');
-            htmlSubmenu.style.display = 'none';
-        };
-        htmlSubmenu.appendChild(html1);
-        htmlSubmenu.appendChild(html2);
-        htmlMain.appendChild(htmlSubmenu);
-
-        htmlMain.addEventListener('mouseenter', function() {
-            htmlSubmenu.style.display = 'block';
+        htmlSubmenu.style.zIndex = '1001';
+        htmlSubmenu.style.padding = '8px 0';
+        htmlFiles.forEach(function(html) {
+            var btn = document.createElement('button');
+            btn.className = 'files-dropdown-item';
+            btn.innerHTML = (html.emoji || '') + html.label;
+            btn.type = 'button';
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                showHtml(html.key);
+                htmlSubmenu.style.display = 'none';
+            };
+            htmlSubmenu.appendChild(btn);
         });
-        htmlMain.addEventListener('mouseleave', function() {
-            htmlSubmenu.style.display = 'none';
-        });
-        htmlMain.addEventListener('click', function(e) {
+        htmlRibbon.appendChild(htmlSubmenu);
+        htmlRibbon.querySelector('.html-ribbon-btn').addEventListener('click', function(e) {
             e.stopPropagation();
             htmlSubmenu.style.display = (htmlSubmenu.style.display === 'block') ? 'none' : 'block';
         });
-        filesDropdown.appendChild(htmlMain);
+        htmlRibbon.addEventListener('mouseleave', function() {
+            htmlSubmenu.style.display = 'none';
+        });
+        filesDropdown.parentNode.insertBefore(htmlRibbon, filesDropdown.nextSibling);
     }
 
     function showHtml(htmlKey) {
         var root = document.getElementById('root');
         if (!root) return;
-        var modal = document.querySelector('.modal, .refresh-box, .error-message');
-        if (modal) modal.style.display = 'none';
-        var htmlFiles = {
-            html1: window.html1Content,
-            html2: window.html2Content
-        };
-        var label = htmlKey;
-        var html = htmlFiles[htmlKey] || '';
-        root.innerHTML = '<div class="data-section"><div class="data-section-header"><span class="data-section-title">HTML: ' + label + '</span></div>' +
-            '<div class="html-content">' + html + '</div></div>';
+        var files = getAllHtmlFiles();
+        var file = files.find(f => f.key === htmlKey);
+        var label = file ? file.label : htmlKey;
+        var content = file ? file.content : '';
+        var type = file ? file.type : 'html';
+        root.innerHTML = '<div class="data-section"><div class="data-section-header"><span class="data-section-title">' + (type === 'markdown' ? 'Markdown: ' : 'HTML: ') + label + '</span></div>' +
+            '<div class="' + (type === 'markdown' ? 'markdown-content' : 'html-content') + '"></div></div>';
         var container = root.querySelector('.data-section');
+        var htmlContent = container.querySelector(type === 'markdown' ? '.markdown-content' : '.html-content');
+        if (type === 'markdown') {
+            htmlContent.innerHTML = simpleMarkdownToHtml(content);
+        } else {
+            htmlContent.innerHTML = content;
+        }
         addHtmlSearch(container, htmlKey);
     }
 
     function tryInjectHtmlMenu() {
+        // Remove HTML from files dropdown if present
         var filesDropdown = document.querySelector('.files-dropdown-content');
-        if (filesDropdown) injectHtmlMenu(filesDropdown);
+        if (filesDropdown) {
+            var htmlMain = filesDropdown.querySelector('.files-html-main');
+            if (htmlMain) htmlMain.remove();
+        }
+        injectHtmlMenuRibbon();
     }
 
     if (document.readyState !== 'loading') tryInjectHtmlMenu();

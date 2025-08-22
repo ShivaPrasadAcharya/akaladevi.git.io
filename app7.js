@@ -12,60 +12,75 @@
             .replace(/\n/g, '<br>');
     }
 
-    function injectMdMenu(filesDropdown) {
-        if (!filesDropdown || filesDropdown.querySelector('.files-md-main')) return;
-        var mdMain = document.createElement('div');
-        mdMain.className = 'files-dropdown-item files-md-main';
-        mdMain.textContent = 'MD';
-        mdMain.style.fontWeight = 'bold';
-        mdMain.tabIndex = 0;
-        mdMain.style.cursor = 'pointer';
-        mdMain.style.position = 'relative';
+    function getAllMarkdownFiles() {
+        var files = [];
+        for (var key in window) {
+            var match = key.match(/^markdown(\d+)Content$/);
+            if (match && window[key]) {
+                var idx = match[1];
+                var meta = window['markdown' + idx + 'Meta'] || {};
+                var label = (meta.name && meta.name.trim()) ? meta.name : ('md' + idx);
+                var emoji = (meta.emoji && meta.emoji.trim()) ? meta.emoji + ' ' : '';
+                files.push({
+                    key: 'md' + idx,
+                    label: label,
+                    emoji: emoji,
+                    content: window[key]
+                });
+            }
+        }
+        files.sort(function(a, b) {
+            var na = parseInt(a.key.replace('md',''), 10);
+            var nb = parseInt(b.key.replace('md',''), 10);
+            return na-nb;
+        });
+        return files;
+    }
 
+    function injectMdMenuRibbon() {
+        if (document.querySelector('.md-ribbon-dropdown')) return;
+        var filesDropdown = document.querySelector('.files-dropdown');
+        if (!filesDropdown) return;
+        var mdFiles = getAllMarkdownFiles();
+        if (mdFiles.length === 0) return;
+        var mdRibbon = document.createElement('div');
+        mdRibbon.className = 'md-ribbon-dropdown';
+        mdRibbon.style.display = 'inline-block';
+        mdRibbon.style.position = 'relative';
+        mdRibbon.style.marginLeft = '8px';
+        mdRibbon.innerHTML = '<button class="md-ribbon-btn" style="font-weight:bold;cursor:pointer;padding:10px 20px;border-radius:25px;border:none;background:#f0f2f5;">MD ▼</button>';
         var mdSubmenu = document.createElement('div');
         mdSubmenu.style.display = 'none';
         mdSubmenu.style.position = 'absolute';
-        mdSubmenu.style.left = '100%';
-        mdSubmenu.style.top = '0';
+        mdSubmenu.style.left = '0';
+        mdSubmenu.style.top = '110%';
         mdSubmenu.style.background = '#fff';
-        mdSubmenu.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
-        mdSubmenu.style.borderRadius = '8px';
+        mdSubmenu.style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)';
+        mdSubmenu.style.borderRadius = '12px';
         mdSubmenu.style.minWidth = '120px';
-        mdSubmenu.style.zIndex = '1002';
-
-        var md1 = document.createElement('button');
-        md1.className = 'files-dropdown-item';
-        md1.textContent = 'md1';
-        md1.type = 'button';
-        md1.onclick = function(e) {
-            e.stopPropagation();
-            showMarkdown('md1');
-            mdSubmenu.style.display = 'none';
-        };
-        var md2 = document.createElement('button');
-        md2.className = 'files-dropdown-item';
-        md2.textContent = 'md2';
-        md2.type = 'button';
-        md2.onclick = function(e) {
-            e.stopPropagation();
-            showMarkdown('md2');
-            mdSubmenu.style.display = 'none';
-        };
-        mdSubmenu.appendChild(md1);
-        mdSubmenu.appendChild(md2);
-        mdMain.appendChild(mdSubmenu);
-
-        mdMain.addEventListener('mouseenter', function() {
-            mdSubmenu.style.display = 'block';
+        mdSubmenu.style.zIndex = '1001';
+        mdSubmenu.style.padding = '8px 0';
+        mdFiles.forEach(function(md) {
+            var btn = document.createElement('button');
+            btn.className = 'files-dropdown-item';
+            btn.innerHTML = (md.emoji || '') + md.label;
+            btn.type = 'button';
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                showMarkdown(md.key);
+                mdSubmenu.style.display = 'none';
+            };
+            mdSubmenu.appendChild(btn);
         });
-        mdMain.addEventListener('mouseleave', function() {
-            mdSubmenu.style.display = 'none';
-        });
-        mdMain.addEventListener('click', function(e) {
+        mdRibbon.appendChild(mdSubmenu);
+        mdRibbon.querySelector('.md-ribbon-btn').addEventListener('click', function(e) {
             e.stopPropagation();
             mdSubmenu.style.display = (mdSubmenu.style.display === 'block') ? 'none' : 'block';
         });
-        filesDropdown.appendChild(mdMain);
+        mdRibbon.addEventListener('mouseleave', function() {
+            mdSubmenu.style.display = 'none';
+        });
+        filesDropdown.parentNode.insertBefore(mdRibbon, filesDropdown.nextSibling);
     }
 
     function highlightMatches(html, query) {
@@ -84,7 +99,7 @@
     // Only search markdown files
     function addMarkdownSearch(container, currentMdKey) {
         var searchBox = document.createElement('div');
-        searchBox.className = 'md-html-search-bar';
+        searchBox.className = 'md-html-search-bar sticky-md-html-search-bar';
         searchBox.style.display = 'flex';
         searchBox.style.alignItems = 'center';
         searchBox.style.gap = '8px';
@@ -99,10 +114,7 @@
         var nextBtn = searchBox.querySelector('.md-search-next');
         var countSpan = searchBox.querySelector('.md-search-count');
         var mdContent = container.querySelector('.markdown-content');
-        var mdFiles = [
-            {key: 'md1', label: 'md1', content: window.markdown1Content},
-            {key: 'md2', label: 'md2', content: window.markdown2Content}
-        ];
+        var mdFiles = getAllMarkdownFiles();
         var allMatches = [];
         var currentGlobalIdx = 0;
 
@@ -132,7 +144,7 @@
             } else {
                 currentGlobalIdx = 0;
             }
-            mdContent.innerHTML = mdFiles[showFileIdx].html;
+            mdContent.innerHTML = mdFiles[showFileIdx] ? mdFiles[showFileIdx].html : '';
             var highlights = mdContent.querySelectorAll('.md-search-highlight');
             var localIdx = 0;
             if (allMatches.length > 0 && allMatches[currentGlobalIdx].fileIdx === showFileIdx) {
@@ -149,7 +161,7 @@
                 countSpan.textContent = '0 / 0';
             }
             var title = container.querySelector('.data-section-title');
-            if (title) title.textContent = 'Markdown: ' + mdFiles[showFileIdx].label;
+            if (title) title.textContent = 'Markdown: ' + (mdFiles[showFileIdx] ? mdFiles[showFileIdx].label : '');
         }
         input.addEventListener('input', function() {
             currentGlobalIdx = 0;
@@ -167,23 +179,26 @@
     function showMarkdown(mdKey) {
         var root = document.getElementById('root');
         if (!root) return;
-        var mdFiles = {
-            md1: window.markdown1Content,
-            md2: window.markdown2Content
-        };
-        var label = mdKey;
-        var md = mdFiles[mdKey] || '';
+        var mdFiles = getAllMarkdownFiles();
+        var md = mdFiles.find(f => f.key === mdKey);
+        var label = md ? md.label : mdKey;
+        var content = md ? md.content : '';
         root.innerHTML = '<div class="data-section"><div class="data-section-header"><span class="data-section-title">Markdown: ' + label + '</span></div>' +
             '<div class="markdown-content"></div></div>';
         var container = root.querySelector('.data-section');
         var mdContent = container.querySelector('.markdown-content');
-        mdContent.innerHTML = simpleMarkdownToHtml(md);
+        mdContent.innerHTML = simpleMarkdownToHtml(content);
         addMarkdownSearch(container, mdKey);
     }
 
     function tryInjectMdMenu() {
+        // Remove MD from files dropdown if present
         var filesDropdown = document.querySelector('.files-dropdown-content');
-        if (filesDropdown) injectMdMenu(filesDropdown);
+        if (filesDropdown) {
+            var mdMain = filesDropdown.querySelector('.files-md-main');
+            if (mdMain) mdMain.remove();
+        }
+        injectMdMenuRibbon();
     }
 
     if (document.readyState !== 'loading') tryInjectMdMenu();

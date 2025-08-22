@@ -15,3 +15,5 @@ window.markdown2Content = `
 ### GROUP C: Short Answer Questions (15 marks)
 **Attempt any three out of five questions (5+5+5)**
 `;
+window.markdown2Meta = { name: "Civil Law Set B", 
+  emoji: "📄" };

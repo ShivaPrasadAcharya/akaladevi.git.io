@@ -9,3 +9,7 @@ window.html1Content = `
 <p><strong>Attempt any one out of two questions (5+5+5+5)</strong></p>
 <h2 id="set-b-medium-level">SET B - MEDIUM LEVEL</h2>
 `;
+window.html1Meta = { 
+  name: "Some HTML",
+   emoji: "📝" 
+  };
