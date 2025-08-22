@@ -7,6 +7,11 @@ var data5Url = `sno,subject,description,shorturl,longurl
 02g,git-Link,Notes,data3Links.js,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data3Links.js
 02h,git-Link,Upload,to Upload files,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/upload/main
 02i,git-Link,Locked images,data6IMAGESS.js,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data6IMAGESS.js
+02j,git-Link,Main Content 1-md,Markdown1,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data7markdown1.js
+02k,git-Link,Main Content 2-md,Markdown2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data8markdown2.js
+02l,git-Link,Main Content 1-html,HTML1,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data8html1.js
+02m,git-Link,Main Content 2-html,HTML2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9html2.js
+
 
 `;
 
@@ -104,5 +109,6 @@ observer.observe(document.body, {
     subtree: true 
 
 });
+
 
 
