@@ -5,7 +5,7 @@ var data1Trainees = `Name,Permanent Address,Temporary Address,Email,Phone No.
 // Dataset metadata
 var data1TraineesInfo = {
     name: "Students",
-    description: "repo file cloned from pkbpsg2082.git.io",
+    description: "data without links and hyperlinks",
     emoji: "👥",
     columns: 6,
     primaryKey: "Name",

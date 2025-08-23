@@ -7,7 +7,7 @@ var data4Status = `SNo,Name,Topic1,Topic2,Status/Remarks
 // Dataset metadata
 var data4StatusInfo = {
     name: "Assignments",
-    description: "Akadevi Assignments Status",
+    description: "Akadevi Assignments Status-colored rows",
     emoji: "📝",
     columns: 6,
     primaryKey: "SNo",
