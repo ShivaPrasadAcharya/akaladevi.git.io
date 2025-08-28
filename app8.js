@@ -171,7 +171,7 @@
         htmlRibbon.style.display = 'inline-block';
         htmlRibbon.style.position = 'relative';
         htmlRibbon.style.marginLeft = '8px';
-        htmlRibbon.innerHTML = '<button class="html-ribbon-btn">HTMLnOtEs ▼</button>';
+        htmlRibbon.innerHTML = '<button class="html-ribbon-btn">NoteX ▼</button>';
         var htmlSubmenu = document.createElement('div');
         htmlSubmenu.style.display = 'none';
         htmlSubmenu.style.position = '';

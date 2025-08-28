@@ -39,6 +39,37 @@ DataApp.prototype.getHTML = function() {
                         <div class="stat-number">${this.showMultipleDatasets ? availableDatasets.length : 1}</div>
                         <div class="stat-label">${this.showMultipleDatasets ? 'Datasets' : 'Dataset'}</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${this.showMultipleDatasets ?
+                            availableDatasets.map(ds => (this.headers[ds]||[]).length).reduce((a,b)=>a+b,0) : (this.headers[this.currentDataset]||[]).length}
+                        </div>
+                        <div class="stat-label">Total Columns</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalOriginalRecords > 0 ? ((totalFilteredRecords/totalOriginalRecords*100).toFixed(1)) : 0}%</div>
+                        <div class="stat-label">% Filtered</div>
+                    </div>
+                </div>
+                <div style="margin-top:18px;">
+                    ${this.showMultipleDatasets ?
+                        `<b>Datasets:</b> <span style='color:#3b82f6;'>${availableDatasets.map(ds => this.datasetInfo[ds]?.name || ds).join(', ')}</span><br>` :
+                        `<b>Dataset:</b> <span style='color:#3b82f6;'>${this.datasetInfo[this.currentDataset]?.name || this.currentDataset}</span><br>`
+                    }
+                    <b>Columns:</b> <span style='color:#6366f1;'>${(this.showMultipleDatasets ?
+                        availableDatasets.map(ds => (this.headers[ds]||[]).join(', ')).join(' | ') :
+                        (this.headers[this.currentDataset]||[]).join(', ')) || 'N/A'}</span><br>
+                    <b>First Record:</b> <span style='color:#059669;'>${(() => {
+                        let d = this.showMultipleDatasets ?
+                            Object.values(this.originalData).flat()[0] :
+                            (this.originalData[this.currentDataset]||[])[0];
+                        return d ? JSON.stringify(d) : 'N/A';
+                    })()}</span><br>
+                    <b>Last Record:</b> <span style='color:#059669;'>${(() => {
+                        let d = this.showMultipleDatasets ?
+                            (()=>{let arr=Object.values(this.originalData).flat();return arr[arr.length-1];})() :
+                            (()=>{let arr=(this.originalData[this.currentDataset]||[]);return arr[arr.length-1];})();
+                        return d ? JSON.stringify(d) : 'N/A';
+                    })()}</span>
                 </div>
             </div>
         </div>
