@@ -12,6 +12,9 @@ var data5Url1 = `sno,subject,description,shorturl,longurl
 02k,git-Link,Main Content 2-md,Markdown2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data7markdown2.js
 02l,git-Link,Main Content 1-html,HTML1,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data8html1.js
 02m,git-Link,Main Content 2-html,HTML2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data8html2.js
+02n,git-Link,Video1,videoslinks,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9Videos1.js
+02nn,git-Link,Video2,wallvideos2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9Videos2.js
+02p,git-Link,Video2,wallvideos2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/upload/main
 
 
 `;
