@@ -52,7 +52,7 @@
     function showVideoGallery() {
         var root = document.getElementById('root');
         if (!root) return;
-        var videos = parseCSV(window.data9Videos || '');
+        var videos = parseCSV(window.data9Videos2 || '');
         root.innerHTML = '<div class="data-section"><div class="data-section-header"><span class="data-section-title">Video Gallery</span></div>' +
             '<div class="video-card-grid"></div></div>';
         var grid = root.querySelector('.video-card-grid');
@@ -71,7 +71,7 @@
         videosRibbon.style.display = 'inline-block';
         videosRibbon.style.position = 'relative';
         videosRibbon.style.marginLeft = '8px';
-        videosRibbon.innerHTML = '<button class="videos-ribbon-btn" style="font-weight:bold;cursor:pointer;padding:10px 20px;border-radius:25px;border:none;background:#f0f2f5;">🎥 Videos ▼</button>';
+        videosRibbon.innerHTML = '<button class="videos-ribbon-btn" style="font-weight:bold;cursor:pointer;padding:10px 20px;border-radius:25px;border:none;background:#f0f2f5;">🎥 Videos2 ▼</button>';
         var videosSubmenu = document.createElement('div');
         videosSubmenu.style.display = 'none';
         videosSubmenu.style.position = 'absolute';
