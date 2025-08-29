@@ -94,10 +94,10 @@ DataApp.prototype.getHTML = function() {
                                     // Choose icon based on dataset name
                                     let icon = info.emoji ||
                                         (dataset === 'data6IMAGESS' ? '🔒' :
-                                         dataset.includes('Trainee') ? '👨‍🎓' :
+                                         dataset.includes('Trainee') ? '🔱' :
                                          dataset.includes('Image') ? '🖼️' :
                                          dataset.includes('Link') ? '🔗' :
-                                         dataset.includes('Status') ? '📋' :
+                                         dataset.includes('Status') ? '✡' :
                                          dataset.includes('Url') ? '🌐' : '📄');
                                     return `<button class="files-dropdown-item ${isActive ? 'active' : ''}" data-dataset="${dataset}">${icon} ${info.name || dataset}</button>`;
                                 }).join('')}
@@ -111,7 +111,7 @@ DataApp.prototype.getHTML = function() {
                     <div style="display: flex; align-items: center; flex: 1; gap: 10px;">
                         <input type="text" class="search-input" placeholder="🔍  Enter character slowly..." value="${this.searchTerm}">
                         <button class="search-toggle-btn ${this.searchMode === 'search1' ? 'search1' : 'search2'}" title="Toggle search mode" onclick="window.dataApp.toggleSearchMode()">
-                            <span class="search-toggle-icon">${this.searchMode === 'search1' ? '🔍' : '🧐'}</span>
+                            <span class="search-toggle-icon">${this.searchMode === 'search1' ? '🔍' : '🧐2'}</span>
                         </button>
                         ${this.searchTerm && searchPosition.total > 0 ? `
                             <div class="search-navigation">
