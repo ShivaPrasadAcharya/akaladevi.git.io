@@ -14,6 +14,7 @@ class DataApp {
         this.activeFilterTab = 'simple';
         this.selectedColumns = {}; // Track selected columns per dataset
         this.showColumnSelector = false; // Toggle column selector visibility
+        this.searchMode = 'search1'; // 'search1' = filter, 'search2' = highlight only
         
         this.init();
     }
@@ -123,6 +124,16 @@ class DataApp {
             currentColumns.push(column);
         } else if (!isChecked) {
             this.selectedColumns[this.currentDataset] = currentColumns.filter(c => c !== column);
+        }
+        this.render();
+    }
+
+    toggleSearchMode() {
+        this.searchMode = this.searchMode === 'search1' ? 'search2' : 'search1';
+        if (this.showMultipleDatasets) {
+            this.applyFiltersToAllDatasets();
+        } else {
+            this.applyFiltersToCurrentDataset();
         }
         this.render();
     }

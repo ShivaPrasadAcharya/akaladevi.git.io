@@ -1356,3 +1356,26 @@ th.highlight-column {
     border-radius: 10px;
     margin-bottom: 12px;
 }
+
+/* Search Toggle Button Styles */
+.search-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    margin-left: 2px;
+    padding: 0 8px;
+    transition: color 0.2s;
+    outline: none;
+    display: flex;
+    align-items: center;
+}
+.search-toggle-btn.search1 .search-toggle-icon {
+    color: #667eea;
+}
+.search-toggle-btn.search2 .search-toggle-icon {
+    color: #e67e22;
+}
+.search-toggle-btn:focus {
+    outline: 2px solid #667eea;
+}

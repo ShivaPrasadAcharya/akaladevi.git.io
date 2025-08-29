@@ -113,9 +113,10 @@ DataApp.prototype.applyFiltersToDataset = function(dataset) {
     }
     
     if (this.searchTerm.trim()) {
-        data = window.searchEngine.search(data, this.searchTerm);
+        if (this.searchMode === 'search1') {
+            data = window.searchEngine.search(data, this.searchTerm);
+        } // else in search2 mode, do not filter, just highlight
     }
-    
     this.filteredData[dataset] = data;
 };
 

@@ -108,9 +108,11 @@ DataApp.prototype.getHTML = function() {
                         </button>
                         <button class="data-btn" onclick="window.dataApp.openStatsModal()" title="Show Data Statistics">📊 DATA</button>
                     </div>
-                    
                     <div style="display: flex; align-items: center; flex: 1; gap: 10px;">
                         <input type="text" class="search-input" placeholder="🔍  Enter character slowly..." value="${this.searchTerm}">
+                        <button class="search-toggle-btn ${this.searchMode === 'search1' ? 'search1' : 'search2'}" title="Toggle search mode" onclick="window.dataApp.toggleSearchMode()">
+                            <span class="search-toggle-icon">${this.searchMode === 'search1' ? '🔍' : '🧐'}</span>
+                        </button>
                         ${this.searchTerm && searchPosition.total > 0 ? `
                             <div class="search-navigation">
                                 <button class="search-nav-btn" onclick="window.searchEngine.navigateToMatch('prev')" ${searchPosition.total <= 1 ? 'disabled' : ''}>
@@ -125,7 +127,6 @@ DataApp.prototype.getHTML = function() {
                             </div>
                         ` : ''}
                     </div>
-                    
                     <button class="help-btn">❓ Help</button>
                 </div>
 
@@ -440,7 +441,7 @@ DataApp.prototype.renderDataTable = function(data, headers, dataset) {
                             return `<tr data-row-index="${index}" style="${rowStyle}">
                                 ${headers.map(header => {
                                     let cellValue = row[header] || '';
-                                    let highlightedValue = window.searchEngine.highlight(cellValue, searchTermToUse);
+                                    let highlightedValue = (this.searchMode === 'search2' && this.searchTerm) ? window.searchEngine.highlight(cellValue, this.searchTerm) : window.searchEngine.highlight(cellValue, (this.searchMode === 'search1' ? this.searchTerm : ''));
                                     // If this is the Link column in data3, render as clickable link
                                     if (isLinksDataset && header === 'Link' && cellValue) {
                                         // If it's a PDF, open in new tab
