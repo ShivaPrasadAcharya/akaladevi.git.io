@@ -10,5 +10,8 @@ var data9Videos1Info = {
     description: "Video Gallery1",
     emoji: "🎥",
     columns: 5,
-    primaryKey: "ID"
+    primaryKey: "ID",
+    rowColors: {
+        "001": "green",
+    }
 };

@@ -3,6 +3,24 @@ DataApp.prototype.render = function() {
     const container = document.getElementById('root');
     container.innerHTML = this.getHTML();
     this.attachEventListeners();
+    // Apply row coloring after rendering tables
+    if (typeof applyRowColorsToTables === 'function') {
+        // Single dataset mode
+        if (!this.showMultipleDatasets) {
+            const info = this.datasetInfo[this.currentDataset];
+            if (info && info.rowColors && info.primaryKey) {
+                applyRowColorsToTables(info);
+            }
+        } else {
+            // Multiple datasets mode
+            Object.keys(this.datasetInfo).forEach(ds => {
+                const info = this.datasetInfo[ds];
+                if (info && info.rowColors && info.primaryKey) {
+                    applyRowColorsToTables(info);
+                }
+            });
+        }
+    }
 };
 
 DataApp.prototype.getHTML = function() {
@@ -379,9 +397,11 @@ DataApp.prototype.renderDataTable = function(data, headers, dataset) {
     const isLinksDataset = dataset === 'data3Links' && headers.includes('Link');
     // Detect if this is the data2 (Images) dataset and has an Image column
     const isImagesDataset = dataset === 'data2Images' && headers.includes('Image');
-    // Generalized row coloring logic for STATUS dataset (data4Status)
-    let rowColors = (window.data4StatusInfo && window.data4StatusInfo.rowColors) || {};
-    let primaryKey = (window.data4StatusInfo && window.data4StatusInfo.primaryKey) ? window.data4StatusInfo.primaryKey.toLowerCase() : '';
+    
+        // Generalized row coloring logic for any dataset with rowColors
+    const info = this.datasetInfo[dataset] || {};
+    let rowColors = info.rowColors || {};
+    let primaryKey = info.primaryKey ? info.primaryKey.toLowerCase() : '';
     let keyColIdx = primaryKey ? headers.findIndex(h => h.toLowerCase() === primaryKey) : -1;
     if (isImagesDataset) {
         // Render as image cards with expandable functionality (no modal here)
@@ -429,16 +449,8 @@ DataApp.prototype.renderDataTable = function(data, headers, dataset) {
                     </thead>
                     <tbody>
                         ${data.map((row, index) => {
-                            let rowStyle = '';
-                            if (dataset === 'data4Status' && keyColIdx !== -1) {
-                                let keyValue = (row[headers[keyColIdx]] || '').toLowerCase();
-                                let color = rowColors[keyValue] || '';
-                                if (color === 'red') rowStyle = 'background-color:#ffd6d6;';
-                                else if (color === 'blue') rowStyle = 'background-color:#d6e6ff;';
-                                else if (color === 'green') rowStyle = 'background-color:#d6ffd6;';
-                                else if (color && color !== 'default') rowStyle = `background-color:${color};`;
-                            }
-                            return `<tr data-row-index="${index}" style="${rowStyle}">
+                            // Remove row coloring logic here; handled by roowcolooring.js
+                            return `<tr data-row-index="${index}">
                                 ${headers.map(header => {
                                     let cellValue = row[header] || '';
                                     let highlightedValue = (this.searchMode === 'search2' && this.searchTerm) ? window.searchEngine.highlight(cellValue, this.searchTerm) : window.searchEngine.highlight(cellValue, (this.searchMode === 'search1' ? this.searchTerm : ''));

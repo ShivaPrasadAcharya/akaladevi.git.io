@@ -12,9 +12,9 @@ var data5Url1 = `sno,subject,description,shorturl,longurl
 02k,git-Link,Main Content 2-md,Markdown2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data7markdown2.js
 02l,git-Link,Main Content 1-html,HTML1,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data8html1.js
 02m,git-Link,Main Content 2-html,HTML2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data8html2.js
-02n,git-Link,Video1,videoslinks,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9Videos1.js
-02nn,git-Link,Video2,wallvideos2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9Videos2.js
-02p,git-Link,Video2,wallvideos2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/upload/main
+02n,git-Link1,Video1,videoslinks,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9Videos1.js
+02nn,git-Link2,Video2,wallvideos2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/edit/main/data9Videos2.js
+02p,git-Link3,Video2,wallvideos2,https://github.com/ShivaPrasadAcharya/akaladevi.git.io/upload/main
 
 
 `;
@@ -28,91 +28,7 @@ var data5Url1Info = {
     primaryKey: "subject",
     rowColors: {
         // Example: highlight a specific shorturl
-        "subject": "blue"
+        "git-Link1": "blue"
     }
 };
-
-// Script to make shorturl a clickable redirect to longurl (web or local file), and longurl cell truncated with ellipsis
-function makeShortUrlLinks() {
-    var info = window.data5UrlInfo || {};
-    var tables = Array.from(document.querySelectorAll('table'));
-    
-    tables.forEach(function (table) {
-        // Skip if already processed
-        if (table.dataset.urlLinksProcessed === 'true') return;
-        
-        // Heuristic: check headers for 'shorturl' and 'longurl'
-        var ths = Array.from(table.querySelectorAll('th'));
-        var hasShort = ths.some(th => th.textContent.trim().toLowerCase() === 'shorturl');
-        var hasLong = ths.some(th => th.textContent.trim().toLowerCase() === 'longurl');
-        if (!(hasShort && hasLong)) return;
-        
-        // Find column indices
-        var headerCells = Array.from(table.querySelectorAll('thead th'));
-        var shortIdx = headerCells.findIndex(th => th.textContent.trim().toLowerCase() === 'shorturl');
-        var longIdx = headerCells.findIndex(th => th.textContent.trim().toLowerCase() === 'longurl');
-        if (shortIdx === -1 || longIdx === -1) return;
-        
-        // Enhance each row
-        Array.from(table.querySelectorAll('tbody tr')).forEach(function (row) {
-            var cells = row.children;
-            if (cells.length <= Math.max(shortIdx, longIdx)) return;
-            
-            var shortCell = cells[shortIdx];
-            var longCell = cells[longIdx];
-            var shortUrl = shortCell.textContent.trim();
-            var longUrl = longCell.textContent.trim();
-            
-            // If already a link, skip
-            if (!shortCell.querySelector('a')) {
-                var href = (/^https?:\/\//i.test(longUrl)) ? longUrl : encodeURI(longUrl);
-                shortCell.innerHTML = `<a href="${href}" target="_blank" title="${longUrl}">${shortUrl}</a>`;
-            }
-            
-            // Truncate longurl for display, but keep full in tooltip and link
-            if (!longCell.querySelector('a')) {
-                var displayUrl = longUrl.length > 18 ? longUrl.slice(0, 15) + '...' : longUrl;
-                var href = (/^https?:\/\//i.test(longUrl)) ? longUrl : encodeURI(longUrl);
-                longCell.innerHTML = `<a href="${href}" target="_blank" title="${longUrl}">${displayUrl}</a>`;
-                longCell.style.maxWidth = '120px';
-                longCell.style.overflow = 'hidden';
-                longCell.style.textOverflow = 'ellipsis';
-                longCell.style.whiteSpace = 'nowrap';
-            }
-        });
-        
-        // Mark as processed to prevent re-processing
-        table.dataset.urlLinksProcessed = 'true';
-    });
-}
-
-// Run on DOM ready
-document.addEventListener('DOMContentLoaded', makeShortUrlLinks);
-
-// Use a more selective observer that only watches for new table additions
-var observer = new MutationObserver(function(mutations) {
-    var shouldProcess = false;
-    mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList') {
-            mutation.addedNodes.forEach(function(node) {
-                if (node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector('table'))) {
-                    shouldProcess = true;
-                }
-            });
-        }
-    });
-    
-    if (shouldProcess) {
-        // Add a small delay to avoid rapid repeated calls
-        setTimeout(makeShortUrlLinks, 100);
-    }
-});
-
-observer.observe(document.body, { 
-    childList: true, 
-    subtree: true 
-
-});
-
-
 
